@@ -13,7 +13,13 @@ import (
 
 func run(r *mux.Router) {
 	credentials := handlers.AllowCredentials()
-	headers := handlers.AllowedHeaders([]string{"Access-Control-Allow-Headers", "X-Requested-With", "Content-Type", "Authorization", "Accept"})
+	headers := handlers.AllowedHeaders([]string{
+		"Access-Control-Allow-Headers",
+		"X-Requested-With",
+		"Content-Type",
+		"Authorization",
+		"Accept",
+	})
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodDelete})
 	origins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
 	log.Fatal(http.ListenAndServe("127.0.0.1:8000", handlers.CORS(credentials, headers, methods, origins)(r)))
@@ -56,4 +62,3 @@ func tokenValidatorMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext((ctx)))
 	})
 }
-
