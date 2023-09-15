@@ -25,6 +25,19 @@ func NewUserManager(database *gorm.DB) UserManager {
 }
 
 func (m *UserManagerImpl) Register(req Request) (*Response, dcubeerrs.Error) {
+	var user User
+	err := m.database.First(&user, User{Username: req.Username}).Error
+	
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occured while creating new user")
+		}
+	}
+
+	if user.Username == req.Username {
+		return nil, dcubeerrs.New(http.StatusBadRequest, "Username already exists")
+	}
+
 	pwHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 
 	if err != nil {
