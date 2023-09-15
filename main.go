@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
+	"github.com/Imranr2/DCUBE_API/internal/application"
 	"github.com/Imranr2/DCUBE_API/internal/database"
 	"github.com/joho/godotenv"
 )
@@ -19,5 +19,5 @@ func main() {
 	}
 
 	db := database.InitDB()
-	fmt.Println(db)
+	application.InitApp(db)
 }
