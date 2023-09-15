@@ -6,6 +6,7 @@ import (
 
 	"github.com/Imranr2/DCUBE_API/internal/application"
 	"github.com/Imranr2/DCUBE_API/internal/database"
+	"github.com/Imranr2/DCUBE_API/internal/server"
 	"github.com/joho/godotenv"
 )
 
@@ -20,4 +21,5 @@ func main() {
 
 	db := database.InitDB()
 	application.InitApp(db)
+	server.InitServer()
 }
