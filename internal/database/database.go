@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Imranr2/DCUBE_API/internal/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -31,6 +32,14 @@ func InitDB() (db *gorm.DB) {
 
 	if err != nil {
 		log.Fatal("Unable to connect to database")
+	}
+
+	err = db.AutoMigrate(
+		&user.User{},
+	)
+
+	if err != nil {
+		log.Fatal("Unable to perform migration")
 	}
 
 	return
