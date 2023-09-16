@@ -18,11 +18,11 @@ import (
 var users = []user.User{{
 	ID: 1,
 	Username: "test1",
-	Password: "password1",
+	Password: "$2a$10$o4xsT2RBlIrK62FQkuPTcOs5NbPefWTz9pq4hU42UGZRopgCB2K4S", // password1
 }, {
 	ID: 2,
 	Username: "test2",
-	Password: "password2",
+	Password: "$2a$10$tDDglbfPHHaBWYTq8mp1LutPsA/.Zz5Tfld0pwGaSXMIgMEU7kRKC", // password2
 }}
 
 var urls = []urlshortener.ShortenedURL{{
@@ -68,7 +68,7 @@ func setup() (app *Application, db *gorm.DB) {
 	return
 }
 
-func TestRegister(t *testing.T) {
+func TestRegisterSuccess(t *testing.T) {
 	app, db := setup()
 	payload := []byte(`{"username":"test3", "password":"password"}`)
 	req, _ := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(payload))
@@ -80,15 +80,36 @@ func TestRegister(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestRegisterFail(t *testing.T) {
+	app, db := setup()
+	payload := []byte(`{"username":"test2", "password":"password"}`)
+	req, _ := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(payload))
+	resp := executeRequest(req, app)
+	assert.Equal(t, http.StatusBadRequest, resp.Code)
+
+	var newUser user.User
+	err := db.First(&newUser, user.User{}).Error
+	assert.EqualError(t, err, gorm.ErrRecordNotFound.Error())
+}
+
+func LoginSuccess(t *testing.T) {
+	app, _ := setup()
+	payload := []byte(`{"username":"test2", "password":"password1"}`)
+	req, _ := http.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(payload))
+	resp := executeRequest(req, app)
+	assert.Equal(t, http.StatusOK, resp.Code)
+}
+
+func LoginFail(t *testing.T) {
+	app, _ := setup()
+	payload := []byte(`{"username":"test2", "password":"wrongPassword"}`)
+	req, _ := http.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(payload))
+	resp := executeRequest(req, app)
+	assert.Equal(t, http.StatusUnauthorized, resp.Code)
+}
+
 func executeRequest(req *http.Request, app *Application) *httptest.ResponseRecorder {
 	recorder := httptest.NewRecorder()
 	app.router.ServeHTTP(recorder, req)
 	return recorder
 }
-
-func checkResponseCode(t *testing.T, expected, actual uint) {
-	if expected != actual {
-		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
-	}
-}
-
