@@ -30,18 +30,18 @@ func tokenValidatorMiddleware(next http.Handler) http.Handler {
 func setCookieMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID, _ := r.Context().Value("user_id").(uint)
-		
+
 		newToken, err := session.GenerateToken(userID)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-		http.SetCookie(w, &http.Cookie {
-			Name: "token",
-			Value: newToken.TokenString,
+		http.SetCookie(w, &http.Cookie{
+			Name:    "token",
+			Value:   newToken.TokenString,
 			Expires: newToken.ExpirationTime,
-			Path: "/",
+			Path:    "/",
 		})
 
 		next.ServeHTTP(w, r)
