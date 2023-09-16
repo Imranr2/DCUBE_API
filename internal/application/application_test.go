@@ -77,7 +77,7 @@ func TestRegister(t *testing.T) {
 
 	var newUser user.User
 	err := db.First(&newUser, user.User{}).Error
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 }
 
 func executeRequest(req *http.Request, app *Application) *httptest.ResponseRecorder {
