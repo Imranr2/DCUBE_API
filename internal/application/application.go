@@ -2,8 +2,10 @@ package application
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	dcubeerrs "github.com/Imranr2/DCUBE_API/internal/errors"
@@ -39,7 +41,8 @@ func (app *Application) Run() {
 	})
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodDelete})
 	origins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
-	log.Fatal(http.ListenAndServe("127.0.0.1:8000", handlers.CORS(credentials, headers, methods, origins)(app.router)))
+	url := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
+	log.Fatal(http.ListenAndServe(url, handlers.CORS(credentials, headers, methods, origins)(app.router)))
 }
 
 func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
