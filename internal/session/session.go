@@ -24,7 +24,7 @@ type Session struct {
 	ExpirationTime time.Time
 }
 
-func getToken(r *http.Request) (string, error) {
+func GetToken(r *http.Request) (string, error) {
 	c, err := r.Cookie("token")
 
 	if err != nil {
@@ -57,7 +57,7 @@ func GenerateToken(id uint) (Session, error) {
 }
 
 func VerifyToken(r *http.Request) (uint, error) {
-	token, err := getToken(r)
+	token, err := GetToken(r)
 
 	if err != nil {
 		return invalidUserID, err
