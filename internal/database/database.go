@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Imranr2/DCUBE_API/internal/urlshortener"
 	"github.com/Imranr2/DCUBE_API/internal/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -36,6 +37,7 @@ func InitDB() (db *gorm.DB) {
 
 	err = db.AutoMigrate(
 		&user.User{},
+		&urlshortener.ShortenedURL{},
 	)
 
 	if err != nil {
