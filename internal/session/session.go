@@ -9,7 +9,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const invalidUserId uint = 0
+const invalidUserID uint = 0
+const validDuration = 5 * time.Minute
 
 var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
@@ -34,7 +35,7 @@ func getToken(r *http.Request) (string, error) {
 }
 
 func GenerateToken(id uint) (Session, error) {
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(validDuration)
 
 	claims := &Claims{
 		ID: id,
@@ -56,24 +57,24 @@ func GenerateToken(id uint) (Session, error) {
 }
 
 func VerifyToken(r *http.Request) (uint, error) {
-	cookie, err := r.Cookie("token")
+	token, err := getToken(r)
 
 	if err != nil {
-		return invalidUserId, err
+		return invalidUserID, err
 	}
 
 	claims := &Claims{}
 
-	tkn, err := jwt.ParseWithClaims(cookie.Value, claims, func(token *jwt.Token) (interface{}, error) {
+	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
 
 	if err != nil {
-		return invalidUserId, err
+		return invalidUserID, err
 	}
 
 	if !tkn.Valid {
-		return invalidUserId, errors.New("Token has expired")
+		return invalidUserID, errors.New("token has expired")
 	}
 
 	return claims.ID, nil

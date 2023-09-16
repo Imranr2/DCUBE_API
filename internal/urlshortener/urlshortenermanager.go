@@ -33,17 +33,17 @@ func (m *URLShortenerManagerImpl) GetURL(req GetRequest) (*GetResponse, dcubeerr
 	err := m.database.Model(&ShortenedURL{}).Where("user_id = ?", req.UserID).Find(&shortenedURLs).Error
 
 	if err != nil {
-		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occured while fetching urls")
+		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while fetching urls")
 	}
 
 	if len(shortenedURLs) == 0 {
 		return nil, dcubeerrs.New(http.StatusNotFound, "User does not have any URLs")
 	}
 
-	return &GetResponse{ ShortenedURLs: shortenedURLs }, nil
+	return &GetResponse{ShortenedURLs: shortenedURLs}, nil
 }
 
-func generateShortenedURL(originalURL string) string {
+func generateShortenedURL() string {
 	b := make([]byte, urlLength)
 	for i := range b {
 		b[i] = characters[rand.Intn(len(characters))]
@@ -54,28 +54,28 @@ func generateShortenedURL(originalURL string) string {
 func (m *URLShortenerManagerImpl) CreateURL(req CreateRequest) (*CreateResponse, dcubeerrs.Error) {
 	var shortened string
 	var shortenedURL ShortenedURL
-	for true {
-		shortened = generateShortenedURL(req.OriginalURL)
+	for {
+		shortened = generateShortenedURL()
 		err := m.database.First(&shortenedURL, ShortenedURL{Shortened: shortened}).Error
 
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				break
 			}
-			return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occured while creating shortened url")
+			return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while creating shortened url")
 		}
 	}
 
 	newShortenedURL := ShortenedURL{
-		Original: req.OriginalURL,
+		Original:  req.OriginalURL,
 		Shortened: shortened,
-		UserID: req.UserID,
+		UserID:    req.UserID,
 	}
 
 	err := m.database.Create(&newShortenedURL).Error
 
 	if err != nil {
-		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occured while creating shortened url")
+		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while creating shortened url")
 	}
 
 	return &CreateResponse{ShortenedURL: newShortenedURL}, nil
@@ -88,9 +88,8 @@ func (m *URLShortenerManagerImpl) DeleteURL(req DeleteRequest) (*DeleteResponse,
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, dcubeerrs.New(http.StatusNotFound, "URL does not exist")
-
 		}
-		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occured while deleting url")
+		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while deleting url")
 	}
 
 	if shortenedURL.UserID != req.UserID {
@@ -100,7 +99,7 @@ func (m *URLShortenerManagerImpl) DeleteURL(req DeleteRequest) (*DeleteResponse,
 	err = m.database.Delete(&ShortenedURL{}, req.ID).Error
 
 	if err != nil {
-		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occured while deleting shortened url")
+		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while deleting shortened url")
 	}
 
 	return &DeleteResponse{ShortenedURL: shortenedURL}, nil

@@ -61,7 +61,6 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.respondWithJSON(w, http.StatusOK, resp)
-	return
 }
 
 func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +82,6 @@ func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.respondWithJSON(w, http.StatusCreated, resp)
-	return
 }
 
 func (app *Application) GetURLs(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +101,6 @@ func (app *Application) GetURLs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.respondWithJSON(w, http.StatusOK, resp)
-	return
 }
 
 func (app *Application) CreateURL(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +130,6 @@ func (app *Application) CreateURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.respondWithJSON(w, http.StatusCreated, resp)
-	return
 }
 
 func (app *Application) DeleteURL(w http.ResponseWriter, r *http.Request) {
@@ -170,7 +166,6 @@ func (app *Application) DeleteURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.respondWithJSON(w, http.StatusOK, resp)
-	return
 }
 
 func (app *Application) initManagers(db *gorm.DB) {

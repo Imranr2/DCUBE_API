@@ -7,21 +7,21 @@ import (
 )
 
 type ShortenedURL struct {
-	ID           uint      `json:"-" gorm:"primaryKey"`
-	Original     string    `json:"original" gorm:"not null"`
-	Shortened    string    `json:"shortened" gorm:"index;unique;not null"`
-	UserID       uint      `json:"-" gorm:"not null"`
-	User         user.User `json:"-" gorm:"foreignKey:UserID;not null"` 
-	CreatedAt    time.Time `json:"-" gorm:"type:timestamp;default:current_timestamp"`
+	ID        uint      `json:"-" gorm:"primaryKey"`
+	Original  string    `json:"original" gorm:"not null"`
+	Shortened string    `json:"shortened" gorm:"index;unique;not null"`
+	UserID    uint      `json:"-" gorm:"not null"`
+	User      user.User `json:"-" gorm:"foreignKey:UserID;not null"`
+	CreatedAt time.Time `json:"-" gorm:"type:timestamp;default:current_timestamp"`
 }
 
 type GetRequest struct {
-	UserID       uint
+	UserID uint
 }
 
 type CreateRequest struct {
-	UserID       uint
-	OriginalURL  string `json:"original_url" validate:"required"`
+	UserID      uint
+	OriginalURL string `json:"original_url" validate:"required"`
 }
 
 type DeleteRequest struct {
