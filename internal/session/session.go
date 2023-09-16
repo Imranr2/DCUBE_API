@@ -11,7 +11,7 @@ import (
 
 const invalidUserId uint = 0
 
-var jwtKey = os.Getenv("JWT_KEY")
+var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 type Claims struct {
 	ID uint `json:"id"`

@@ -33,10 +33,11 @@ func (m *URLShortenerManagerImpl) GetURL(req GetRequest) (*GetResponse, dcubeerr
 	err := m.database.Model(&ShortenedURL{}).Where("user_id = ?", req.UserID).Find(&shortenedURLs).Error
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, dcubeerrs.New(http.StatusNotFound, "User does not have any URLs")
-		}
 		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occured while fetching urls")
+	}
+
+	if len(shortenedURLs) == 0 {
+		return nil, dcubeerrs.New(http.StatusNotFound, "User does not have any URLs")
 	}
 
 	return &GetResponse{ ShortenedURLs: shortenedURLs }, nil
@@ -55,7 +56,7 @@ func (m *URLShortenerManagerImpl) CreateURL(req CreateRequest) (*CreateResponse,
 	var shortenedURL ShortenedURL
 	for true {
 		shortened = generateShortenedURL(req.OriginalURL)
-		err := m.database.First(&shortenedURL, ShortenedURL{Original: req.OriginalURL}).Error
+		err := m.database.First(&shortenedURL, ShortenedURL{Shortened: shortened}).Error
 
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
