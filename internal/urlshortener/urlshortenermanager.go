@@ -16,6 +16,7 @@ type URLShortenerManager interface {
 	GetURL(GetRequest) (*GetResponse, dcubeerrs.Error)
 	CreateURL(CreateRequest) (*CreateResponse, dcubeerrs.Error)
 	DeleteURL(DeleteRequest) (*DeleteResponse, dcubeerrs.Error)
+	Redirect(RedirectRequest) (*RedirectResponse, dcubeerrs.Error)
 }
 
 type URLShortenerManagerImpl struct {
@@ -30,6 +31,7 @@ func NewURLShortenerManager(database *gorm.DB) URLShortenerManager {
 
 func (m *URLShortenerManagerImpl) GetURL(req GetRequest) (*GetResponse, dcubeerrs.Error) {
 	var shortenedURLs []ShortenedURL
+
 	err := m.database.Model(&ShortenedURL{}).Where("user_id = ?", req.UserID).Find(&shortenedURLs).Error
 
 	if err != nil {
@@ -54,6 +56,7 @@ func generateShortenedURL() string {
 func (m *URLShortenerManagerImpl) CreateURL(req CreateRequest) (*CreateResponse, dcubeerrs.Error) {
 	var shortened string
 	var shortenedURL ShortenedURL
+
 	for {
 		shortened = generateShortenedURL()
 		err := m.database.First(&shortenedURL, ShortenedURL{Shortened: shortened}).Error
@@ -103,4 +106,18 @@ func (m *URLShortenerManagerImpl) DeleteURL(req DeleteRequest) (*DeleteResponse,
 	}
 
 	return &DeleteResponse{ShortenedURL: shortenedURL}, nil
+}
+
+func (m *URLShortenerManagerImpl) Redirect(req RedirectRequest) (*RedirectResponse, dcubeerrs.Error) {
+	var shortenedURL ShortenedURL
+	
+	err := m.database.First(&shortenedURL, ShortenedURL{Shortened: req.URL}).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, dcubeerrs.New(http.StatusNotFound, "URL does not exist")
+		}
+		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while deleting url")
+	}
+
+	return &RedirectResponse{OriginalURL: shortenedURL.Original}, nil
 }

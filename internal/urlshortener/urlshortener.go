@@ -29,6 +29,10 @@ type DeleteRequest struct {
 	ID     uint
 }
 
+type RedirectRequest struct {
+	URL string
+}
+
 type GetResponse struct {
 	ShortenedURLs []ShortenedURL `json:"shortened_urls"`
 }
@@ -39,4 +43,8 @@ type CreateResponse struct {
 
 type DeleteResponse struct {
 	ShortenedURL ShortenedURL `json:"shortened_url"`
+}
+
+type RedirectResponse struct {
+	OriginalURL string `json:"original"`
 }
