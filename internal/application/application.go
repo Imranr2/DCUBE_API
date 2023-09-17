@@ -11,6 +11,7 @@ import (
 	dcubeerrs "github.com/Imranr2/DCUBE_API/internal/errors"
 	"github.com/Imranr2/DCUBE_API/internal/urlshortener"
 	"github.com/Imranr2/DCUBE_API/internal/user"
+	"github.com/Imranr2/DCUBE_API/internal/utils"
 	"github.com/go-playground/validator"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -63,7 +64,7 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusOK, resp)
+	app.respondWithJSON(w, http.StatusOK, "Successfully logged in!", resp)
 }
 
 func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +85,7 @@ func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusCreated, resp)
+	app.respondWithJSON(w, http.StatusCreated, "Successfully registered!", resp)
 }
 
 func (app *Application) GetURLs(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +104,7 @@ func (app *Application) GetURLs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusOK, resp)
+	app.respondWithJSON(w, http.StatusOK,"Successfully retrieved shortened URLs!", resp)
 }
 
 func (app *Application) CreateURL(w http.ResponseWriter, r *http.Request) {
@@ -132,7 +133,7 @@ func (app *Application) CreateURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusCreated, resp)
+	app.respondWithJSON(w, http.StatusCreated, "Successfully shortened URL!",  resp)
 }
 
 func (app *Application) DeleteURL(w http.ResponseWriter, r *http.Request) {
@@ -168,7 +169,7 @@ func (app *Application) DeleteURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusOK, resp)
+	app.respondWithJSON(w, http.StatusOK, "Successfully deleted URL!", resp)
 }
 
 func (app *Application) initManagers(db *gorm.DB) {
@@ -203,10 +204,10 @@ func (app *Application) validateParams(s interface{}) dcubeerrs.Error {
 }
 
 func (app *Application) respondWithError(w http.ResponseWriter, err dcubeerrs.Error) {
-	app.respondWithJSON(w, err.StatusCode(), map[string]string{"error": err.Message()})
+	app.respondWithJSON(w, err.StatusCode(), err.Message(), map[string]string{"error": err.Message()})
 }
 
-func (app *Application) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+func (app *Application) respondWithJSON(w http.ResponseWriter, code int, message string, payload interface{}) {
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(payload)
+	json.NewEncoder(w).Encode(&utils.APIResponse{Payload: payload, StatusCode: code, Message: message})
 }
