@@ -73,10 +73,12 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   newToken.TokenString,
-		Expires: newToken.ExpirationTime,
-		Path:    "/",
+		Name:     "token",
+		Value:    newToken.TokenString,
+		Expires:  newToken.ExpirationTime,
+		Path:     "/",
+		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
 	})
 
 	app.respondWithJSON(w, http.StatusOK, "Successfully logged in!", resp)

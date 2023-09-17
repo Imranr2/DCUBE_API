@@ -38,10 +38,12 @@ func setCookieMiddleware(next http.Handler) http.Handler {
 		}
 
 		http.SetCookie(w, &http.Cookie{
-			Name:    "token",
-			Value:   newToken.TokenString,
-			Expires: newToken.ExpirationTime,
-			Path:    "/",
+			Name:     "token",
+			Value:    newToken.TokenString,
+			Expires:  newToken.ExpirationTime,
+			Path:     "/",
+			SameSite: http.SameSiteNoneMode,
+			Secure:   true,
 		})
 
 		next.ServeHTTP(w, r)
