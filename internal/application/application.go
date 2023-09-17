@@ -79,6 +79,7 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		SameSite: http.SameSiteNoneMode,
 		Secure:   true,
+		Domain:   "https://frabjous-chimera-50b2e7.netlify.app/",
 	})
 
 	app.respondWithJSON(w, http.StatusOK, "Successfully logged in!", resp)

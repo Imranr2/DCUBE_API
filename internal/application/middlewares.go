@@ -44,6 +44,7 @@ func setCookieMiddleware(next http.Handler) http.Handler {
 			Path:     "/",
 			SameSite: http.SameSiteNoneMode,
 			Secure:   true,
+			Domain:   "https://frabjous-chimera-50b2e7.netlify.app/",
 		})
 
 		next.ServeHTTP(w, r)
