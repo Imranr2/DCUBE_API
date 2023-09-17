@@ -119,7 +119,7 @@ func (app *Application) GetURLs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusOK,"Successfully retrieved shortened URLs!", resp)
+	app.respondWithJSON(w, http.StatusOK, "Successfully retrieved shortened URLs!", resp)
 }
 
 func (app *Application) CreateURL(w http.ResponseWriter, r *http.Request) {
@@ -148,7 +148,7 @@ func (app *Application) CreateURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusCreated, "Successfully shortened URL!",  resp)
+	app.respondWithJSON(w, http.StatusCreated, "Successfully shortened URL!", resp)
 }
 
 func (app *Application) DeleteURL(w http.ResponseWriter, r *http.Request) {
