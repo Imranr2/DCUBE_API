@@ -218,6 +218,7 @@ func (app *Application) initManagers(db *gorm.DB) {
 
 func (app *Application) initRoutes() {
 	app.router.Use(commonMiddleware)
+	app.router.HandleFunc("/login", app.Login).Methods(http.MethodPost)
 	app.router.HandleFunc("/register", app.Register).Methods(http.MethodPost)
 	app.router.HandleFunc("/r/{url}", app.Redirect).Methods(http.MethodGet)
 
@@ -227,10 +228,6 @@ func (app *Application) initRoutes() {
 	api.HandleFunc("", app.GetURLs).Methods(http.MethodGet)
 	api.HandleFunc("", app.CreateURL).Methods(http.MethodPost)
 	api.HandleFunc("/{id}", app.DeleteURL).Methods(http.MethodDelete)
-
-	login := app.router.Path("/login").Subrouter()
-	login.Use(setCookieMiddleware)
-	login.HandleFunc("", app.Login).Methods(http.MethodPost)
 }
 
 func (app *Application) validateParams(s interface{}) dcubeerrs.Error {
