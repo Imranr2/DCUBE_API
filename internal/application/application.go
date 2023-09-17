@@ -42,7 +42,7 @@ func (app *Application) Run() {
 		"Accept",
 	})
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodDelete})
-	origins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	origins := handlers.AllowedOrigins([]string{os.Getenv("FRONTEND_URL")})
 	url := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
 	log.Fatal(http.ListenAndServe(url, handlers.CORS(credentials, headers, methods, origins)(app.router)))
 }
@@ -187,6 +187,29 @@ func (app *Application) DeleteURL(w http.ResponseWriter, r *http.Request) {
 	app.respondWithJSON(w, http.StatusOK, "Successfully deleted URL!", resp)
 }
 
+func (app *Application) Redirect(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	url, ok := params["url"]
+
+	if !ok {
+		app.respondWithError(w, dcubeerrs.New(http.StatusBadRequest, "Missing URL"))
+		return
+	}
+
+	var redirectRequest urlshortener.RedirectRequest
+	redirectRequest.URL = url
+
+	resp, err := urlShortenerManager.Redirect(redirectRequest)
+
+	if err != nil {
+		app.respondWithError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, resp.OriginalURL, http.StatusSeeOther)
+	// app.respondWithJSON(w, http.StatusSeeOther, "Redirecting to original URL", resp)
+}
+
 func (app *Application) initManagers(db *gorm.DB) {
 	userManager = user.NewUserManager(db)
 	urlShortenerManager = urlshortener.NewURLShortenerManager(db)
@@ -195,6 +218,7 @@ func (app *Application) initManagers(db *gorm.DB) {
 func (app *Application) initRoutes() {
 	app.router.Use(commonMiddleware)
 	app.router.HandleFunc("/register", app.Register).Methods(http.MethodPost)
+	app.router.HandleFunc("/r/{url}", app.Redirect).Methods(http.MethodGet)
 
 	api := app.router.PathPrefix("/url").Subrouter()
 	api.Use(tokenValidatorMiddleware)
@@ -206,6 +230,9 @@ func (app *Application) initRoutes() {
 	login := app.router.Path("/login").Subrouter()
 	login.Use(setCookieMiddleware)
 	login.HandleFunc("", app.Login).Methods(http.MethodPost)
+
+	// redirect := app.router.PathPrefix("/redirect").Subrouter()
+	// redirect.HandleFunc("/{url}", app.Redirect).Methods(http.MethodGet)
 }
 
 func (app *Application) validateParams(s interface{}) dcubeerrs.Error {
