@@ -110,7 +110,7 @@ func (m *URLShortenerManagerImpl) DeleteURL(req DeleteRequest) (*DeleteResponse,
 
 func (m *URLShortenerManagerImpl) Redirect(req RedirectRequest) (*RedirectResponse, dcubeerrs.Error) {
 	var shortenedURL ShortenedURL
-	
+
 	err := m.database.First(&shortenedURL, ShortenedURL{Shortened: req.URL}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

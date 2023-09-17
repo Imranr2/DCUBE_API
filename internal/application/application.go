@@ -207,7 +207,6 @@ func (app *Application) Redirect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, resp.OriginalURL, http.StatusSeeOther)
-	// app.respondWithJSON(w, http.StatusSeeOther, "Redirecting to original URL", resp)
 }
 
 func (app *Application) initManagers(db *gorm.DB) {
@@ -230,9 +229,6 @@ func (app *Application) initRoutes() {
 	login := app.router.Path("/login").Subrouter()
 	login.Use(setCookieMiddleware)
 	login.HandleFunc("", app.Login).Methods(http.MethodPost)
-
-	// redirect := app.router.PathPrefix("/redirect").Subrouter()
-	// redirect.HandleFunc("/{url}", app.Redirect).Methods(http.MethodGet)
 }
 
 func (app *Application) validateParams(s interface{}) dcubeerrs.Error {
