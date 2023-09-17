@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	dcubeerrs "github.com/Imranr2/DCUBE_API/internal/errors"
+	"github.com/Imranr2/DCUBE_API/internal/session"
 	"github.com/Imranr2/DCUBE_API/internal/urlshortener"
 	"github.com/Imranr2/DCUBE_API/internal/user"
 	"github.com/Imranr2/DCUBE_API/internal/utils"
@@ -63,6 +64,20 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 		app.respondWithError(w, err)
 		return
 	}
+
+	newToken, e := session.GenerateToken(resp.User.ID)
+
+	if e != nil {
+		app.respondWithError(w, dcubeerrs.New(http.StatusInternalServerError, e.Error()))
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   newToken.TokenString,
+		Expires: newToken.ExpirationTime,
+		Path:    "/",
+	})
 
 	app.respondWithJSON(w, http.StatusOK, "Successfully logged in!", resp)
 }
