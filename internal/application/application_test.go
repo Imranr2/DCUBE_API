@@ -124,6 +124,12 @@ func TestGetURLsSuccess(t *testing.T) {
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusOK, resp.Code)
+
+	// When user has no urls it returns 200 status
+	token, _ = session.GenerateToken(uint(3))
+	req.Header.Add("Authorization", token.TokenString)
+	resp = executeRequest(req, app)
+	assert.Equal(t, http.StatusOK, resp.Code)
 }
 
 func TestGetURLsFail(t *testing.T) {
@@ -134,12 +140,6 @@ func TestGetURLsFail(t *testing.T) {
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusUnauthorized, resp.Code)
-
-	token, _ := session.GenerateToken(uint(3))
-	req.Header.Add("Authorization", token.TokenString)
-
-	resp = executeRequest(req, app)
-	assert.Equal(t, http.StatusNotFound, resp.Code)
 }
 
 func TestCreateURLSuccess(t *testing.T) {
