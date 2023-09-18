@@ -38,10 +38,6 @@ func (m *URLShortenerManagerImpl) GetURL(req GetRequest) (*GetResponse, dcubeerr
 		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while fetching urls")
 	}
 
-	if len(shortenedURLs) == 0 {
-		return nil, dcubeerrs.New(http.StatusNotFound, "User does not have any URLs")
-	}
-
 	return &GetResponse{ShortenedURLs: shortenedURLs}, nil
 }
 
