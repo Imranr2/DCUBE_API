@@ -202,7 +202,7 @@ func (app *Application) Redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, resp.OriginalURL, http.StatusSeeOther)
+	app.respondWithJSON(w, http.StatusOK, "Redirecting...", resp)
 }
 
 func (app *Application) initManagers(db *gorm.DB) {

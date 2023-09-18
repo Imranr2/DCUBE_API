@@ -28,7 +28,7 @@ func GetToken(r *http.Request) (string, error) {
 	val, ok := r.Header["Authorization"]
 
 	if !ok {
-		return "", errors.New("Missing authorization header")
+		return "", errors.New("missing authorization header")
 	}
 
 	return val[0], nil

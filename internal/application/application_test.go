@@ -120,7 +120,7 @@ func TestGetURLsSuccess(t *testing.T) {
 	ctx = context.WithValue(ctx, "user_id", 1)
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "/url", nil)
 	token, _ := session.GenerateToken(uint(1))
-	req.AddCookie(&http.Cookie{Name: "token", Value: token.TokenString})
+	req.Header.Add("Authorization", token.TokenString)
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusOK, resp.Code)
@@ -136,7 +136,7 @@ func TestGetURLsFail(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, resp.Code)
 
 	token, _ := session.GenerateToken(uint(3))
-	req.AddCookie(&http.Cookie{Name: "token", Value: token.TokenString})
+	req.Header.Add("Authorization", token.TokenString)
 
 	resp = executeRequest(req, app)
 	assert.Equal(t, http.StatusNotFound, resp.Code)
@@ -149,7 +149,7 @@ func TestCreateURLSuccess(t *testing.T) {
 	payload := []byte(`{"original_url":"www.newurl.com"}`)
 	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, "/url", bytes.NewBuffer(payload))
 	token, _ := session.GenerateToken(uint(1))
-	req.AddCookie(&http.Cookie{Name: "token", Value: token.TokenString})
+	req.Header.Add("Authorization", token.TokenString)
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusCreated, resp.Code)
@@ -176,7 +176,7 @@ func TestDeleteURLSuccess(t *testing.T) {
 	ctx = context.WithValue(ctx, "user_id", 1)
 	req, _ := http.NewRequestWithContext(ctx, http.MethodDelete, "/url/1", nil)
 	token, _ := session.GenerateToken(uint(1))
-	req.AddCookie(&http.Cookie{Name: "token", Value: token.TokenString})
+	req.Header.Add("Authorization", token.TokenString)
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusOK, resp.Code)
@@ -197,14 +197,14 @@ func TestDeleteURLFail(t *testing.T) {
 
 	req, _ = http.NewRequestWithContext(ctx, http.MethodDelete, "/url/200", nil)
 	token, _ := session.GenerateToken(uint(1))
-	req.AddCookie(&http.Cookie{Name: "token", Value: token.TokenString})
+	req.Header.Add("Authorization", token.TokenString)
 
 	resp = executeRequest(req, app)
 	assert.Equal(t, http.StatusNotFound, resp.Code)
 
 	req, _ = http.NewRequestWithContext(ctx, http.MethodDelete, "/url/3", nil)
 	token, _ = session.GenerateToken(uint(1))
-	req.AddCookie(&http.Cookie{Name: "token", Value: token.TokenString})
+	req.Header.Add("Authorization", token.TokenString)
 
 	resp = executeRequest(req, app)
 	assert.Equal(t, http.StatusForbidden, resp.Code)
