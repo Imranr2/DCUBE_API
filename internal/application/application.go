@@ -43,8 +43,9 @@ func (app *Application) Run() {
 	})
 	methods := handlers.AllowedMethods([]string{http.MethodGet, http.MethodPost, http.MethodDelete})
 	origins := handlers.AllowedOrigins([]string{os.Getenv("FRONTEND_URL")})
+	exposedHeaders := handlers.ExposedHeaders([]string{"Authorization"})
 	url := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
-	log.Fatal(http.ListenAndServe(url, handlers.CORS(credentials, headers, methods, origins)(app.router)))
+	log.Fatal(http.ListenAndServe(url, handlers.CORS(credentials, headers, methods, origins, exposedHeaders)(app.router)))
 }
 
 func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
@@ -72,15 +73,7 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "token",
-		Value:    newToken.TokenString,
-		Expires:  newToken.ExpirationTime,
-		Path:     "/",
-		SameSite: http.SameSiteNoneMode,
-		Secure:   true,
-		Domain:   "https://frabjous-chimera-50b2e7.netlify.app/",
-	})
+	w.Header().Add("Authorization", newToken.TokenString)
 
 	app.respondWithJSON(w, http.StatusOK, "Successfully logged in!", resp)
 }
@@ -225,7 +218,7 @@ func (app *Application) initRoutes() {
 
 	api := app.router.PathPrefix("/url").Subrouter()
 	api.Use(tokenValidatorMiddleware)
-	api.Use(setCookieMiddleware)
+	api.Use(setAuthHeaderMiddleware)
 	api.HandleFunc("", app.GetURLs).Methods(http.MethodGet)
 	api.HandleFunc("", app.CreateURL).Methods(http.MethodPost)
 	api.HandleFunc("/{id}", app.DeleteURL).Methods(http.MethodDelete)

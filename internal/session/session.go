@@ -25,13 +25,13 @@ type Session struct {
 }
 
 func GetToken(r *http.Request) (string, error) {
-	c, err := r.Cookie("token")
+	val, ok := r.Header["Authorization"]
 
-	if err != nil {
-		return "", err
+	if !ok {
+		return "", errors.New("Missing authorization header")
 	}
 
-	return c.Value, err
+	return val[0], nil
 }
 
 func GenerateToken(id uint) (Session, error) {

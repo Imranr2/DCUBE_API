@@ -27,7 +27,7 @@ func tokenValidatorMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func setCookieMiddleware(next http.Handler) http.Handler {
+func setAuthHeaderMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID, _ := r.Context().Value("user_id").(uint)
 
@@ -37,15 +37,7 @@ func setCookieMiddleware(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-		http.SetCookie(w, &http.Cookie{
-			Name:     "token",
-			Value:    newToken.TokenString,
-			Expires:  newToken.ExpirationTime,
-			Path:     "/",
-			SameSite: http.SameSiteNoneMode,
-			Secure:   true,
-			Domain:   "https://frabjous-chimera-50b2e7.netlify.app/",
-		})
+		w.Header().Add("Authorization", newToken.TokenString)
 
 		next.ServeHTTP(w, r)
 	})
