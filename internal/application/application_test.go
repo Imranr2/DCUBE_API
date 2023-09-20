@@ -74,10 +74,10 @@ func setup() (app *Application, db *gorm.DB) {
 	return
 }
 
-func TestRegisterSuccess(t *testing.T) {
+func TestSignUpSuccess(t *testing.T) {
 	app, db := setup()
 	payload := []byte(`{"username":"test3", "password":"password"}`)
-	req, _ := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest(http.MethodPost, "/signup", bytes.NewBuffer(payload))
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusCreated, resp.Code)
@@ -87,28 +87,28 @@ func TestRegisterSuccess(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestRegisterFail(t *testing.T) {
+func TestSignUpFail(t *testing.T) {
 	app, _ := setup()
 	payload := []byte(`{"username":"test2", "password":"password"}`)
-	req, _ := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest(http.MethodPost, "/signup", bytes.NewBuffer(payload))
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 }
 
-func TestLoginSuccess(t *testing.T) {
+func TestSignInSuccess(t *testing.T) {
 	app, _ := setup()
 	payload := []byte(`{"username":"test1", "password":"password1"}`)
-	req, _ := http.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(payload))
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusOK, resp.Code)
 }
 
-func TestLoginFail(t *testing.T) {
+func TestSignInFail(t *testing.T) {
 	app, _ := setup()
 	payload := []byte(`{"username":"test2", "password":"wrongPassword"}`)
-	req, _ := http.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(payload))
 
 	resp := executeRequest(req, app)
 	assert.Equal(t, http.StatusUnauthorized, resp.Code)

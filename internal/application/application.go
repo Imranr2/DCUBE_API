@@ -48,18 +48,18 @@ func (app *Application) Run() {
 	log.Fatal(http.ListenAndServe(url, handlers.CORS(credentials, headers, methods, origins, exposedHeaders)(app.router)))
 }
 
-func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
-	var loginRequest user.Request
-	json.NewDecoder(r.Body).Decode(&loginRequest)
+func (app *Application) SignIn(w http.ResponseWriter, r *http.Request) {
+	var signInRequest user.Request
+	json.NewDecoder(r.Body).Decode(&signInRequest)
 
-	err := app.validateParams(loginRequest)
+	err := app.validateParams(signInRequest)
 
 	if err != nil {
 		app.respondWithError(w, err)
 		return
 	}
 
-	resp, err := userManager.Login(loginRequest)
+	resp, err := userManager.SignIn(signInRequest)
 
 	if err != nil {
 		app.respondWithError(w, err)
@@ -75,28 +75,28 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Authorization", newToken.TokenString)
 
-	app.respondWithJSON(w, http.StatusOK, "Successfully logged in!", resp)
+	app.respondWithJSON(w, http.StatusOK, "Successfully signed in!", resp)
 }
 
-func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
-	var registerRequest user.Request
-	json.NewDecoder(r.Body).Decode(&registerRequest)
+func (app *Application) SignUp(w http.ResponseWriter, r *http.Request) {
+	var signUpRequest user.Request
+	json.NewDecoder(r.Body).Decode(&signUpRequest)
 
-	err := app.validateParams(registerRequest)
-
-	if err != nil {
-		app.respondWithError(w, err)
-		return
-	}
-
-	resp, err := userManager.Register(registerRequest)
+	err := app.validateParams(signUpRequest)
 
 	if err != nil {
 		app.respondWithError(w, err)
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusCreated, "Successfully registered!", resp)
+	resp, err := userManager.SignUp(signUpRequest)
+
+	if err != nil {
+		app.respondWithError(w, err)
+		return
+	}
+
+	app.respondWithJSON(w, http.StatusCreated, "Successfully signed up!", resp)
 }
 
 func (app *Application) GetURLs(w http.ResponseWriter, r *http.Request) {
@@ -212,8 +212,8 @@ func (app *Application) initManagers(db *gorm.DB) {
 
 func (app *Application) initRoutes() {
 	app.router.Use(commonMiddleware)
-	app.router.HandleFunc("/login", app.Login).Methods(http.MethodPost)
-	app.router.HandleFunc("/register", app.Register).Methods(http.MethodPost)
+	app.router.HandleFunc("/signin", app.SignIn).Methods(http.MethodPost)
+	app.router.HandleFunc("/signup", app.SignUp).Methods(http.MethodPost)
 	app.router.HandleFunc("/r/{url}", app.Redirect).Methods(http.MethodGet)
 
 	api := app.router.PathPrefix("/url").Subrouter()

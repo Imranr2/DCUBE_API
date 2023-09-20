@@ -10,8 +10,8 @@ import (
 )
 
 type UserManager interface {
-	Register(Request) (*Response, dcubeerrs.Error)
-	Login(Request) (*Response, dcubeerrs.Error)
+	SignUp(Request) (*Response, dcubeerrs.Error)
+	SignIn(Request) (*Response, dcubeerrs.Error)
 }
 
 type UserManagerImpl struct {
@@ -24,7 +24,7 @@ func NewUserManager(database *gorm.DB) UserManager {
 	}
 }
 
-func (m *UserManagerImpl) Register(req Request) (*Response, dcubeerrs.Error) {
+func (m *UserManagerImpl) SignUp(req Request) (*Response, dcubeerrs.Error) {
 	var user User
 	err := m.database.First(&user, User{Username: req.Username}).Error
 
@@ -58,7 +58,7 @@ func (m *UserManagerImpl) Register(req Request) (*Response, dcubeerrs.Error) {
 	return &Response{User: newUser}, nil
 }
 
-func (m *UserManagerImpl) Login(req Request) (*Response, dcubeerrs.Error) {
+func (m *UserManagerImpl) SignIn(req Request) (*Response, dcubeerrs.Error) {
 	var user User
 	err := m.database.First(&user, User{Username: req.Username}).Error
 
