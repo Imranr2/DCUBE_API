@@ -64,7 +64,7 @@ func (m *UserManagerImpl) SignIn(req Request) (*Response, dcubeerrs.Error) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, dcubeerrs.New(http.StatusUnauthorized, "Invalid credentials")
+			return nil, dcubeerrs.New(http.StatusUnauthorized, "Invalid username or password")
 		}
 		return nil, dcubeerrs.New(http.StatusInternalServerError, "An error occurred while authenticating user")
 	}
@@ -72,7 +72,7 @@ func (m *UserManagerImpl) SignIn(req Request) (*Response, dcubeerrs.Error) {
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 
 	if err != nil {
-		return nil, dcubeerrs.New(http.StatusUnauthorized, "Invalid credentials")
+		return nil, dcubeerrs.New(http.StatusUnauthorized, "Invalid username or password")
 	}
 
 	return &Response{User: user}, nil

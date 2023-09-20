@@ -55,7 +55,7 @@ func (app *Application) SignIn(w http.ResponseWriter, r *http.Request) {
 	err := app.validateParams(signInRequest)
 
 	if err != nil {
-		app.respondWithError(w, err)
+		app.respondWithError(w, dcubeerrs.New(http.StatusBadRequest, "Invalid username or password"))
 		return
 	}
 
